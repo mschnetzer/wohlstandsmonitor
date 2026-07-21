@@ -1,0 +1,349 @@
+---
+title: "Wohlstandsmonitor"
+# author: "Matthias Schnetzer"
+format: 
+    dashboard:
+        expandable: false
+        scrolling: false
+        orientation: rows
+        logo: img/aklogo.png
+        nav-buttons: 
+            - icon: "envelope"
+              href: "mailto:matthias.schnetzer@akwien.at"
+            - icon: "github"
+              href: "https://github.com/mschnetzer"
+            - icon: "bluesky"
+              href: "https://bsky.app/profile/matschnetzer.bsky.social"
+theme: 
+    - sandstone
+    - econdash.scss
+
+---
+
+```{r setup}
+#| include: false
+#| echo: false
+#| message: false
+#| warning: false
+librarian::shelf(tidyverse, lubridate, scales, plotly, highcharter, reactable, reactablefmtr, gt, gtExtras, glue, eurostat, plotly, ggiraph, countrycode, bslib, bsicons, leaflet, giscoR, sf, crosstalk, htmlwidgets, DT, shiny, httr, jsonlite)
+```
+
+```{r data}
+#| include: false
+#| echo: false
+#| message: false
+#| warning: false
+#| cache: true
+countries <- countrycode::codelist |> 
+    filter(eu28 == "EU") |> 
+    select(iso2c, country.name.de)
+
+gdp <- eurostat::get_eurostat("nama_10_gdp", time_format = "date", filters = list(geo = "AT", na_item = "B1GQ", unit = "CP_MEUR"))
+
+gdpgrowth <- eurostat::get_eurostat("tec00115", time_format = "date", filters = list(geo = "AT", unit = "CLV_PCH_PRE"))
+
+gdppc <- eurostat::get_eurostat("sdg_08_10", time_format = "date", filters = list(unit = "CLV20_EUR_HAB", sinceTimePeriod = 2000))
+
+unemp <- eurostat::get_eurostat("une_rt_m", time_format = "date", filters = list(age = "TOTAL", sex = "T", s_adj = "SA", unit = "PC_ACT", lastTimePeriod = 3)) |> drop_na()
+
+poverty <- eurostat::get_eurostat("ilc_peps01n", time_format = "date", filters = list(geo = "AT", sex = "T", age= "TOTAL", unit = "PC", lastTimePeriod = 3)) |> drop_na()
+
+gpg <- eurostat::get_eurostat("earn_gr_gpgr2", time_format = "date", filters = list(nace_r2 = "B-S_X_O", lastTimePeriod = 1)) |> drop_na()
+
+annualunemp <- eurostat::get_eurostat("une_rt_a", time_format = "date", filters = list(age = "Y15-74", sex = "T", unit = "PC_ACT", lastTimePeriod = 15)) |> drop_na()
+
+inflation <- eurostat::get_eurostat("prc_hicp_minr", time_format = "date", filters = list(coicop18 = "TOTAL", unit = "RCH_A", lastTimePeriod = 24))
+
+tempwien <- GET(glue::glue("https://dataset.api.hub.geosphere.at/v1/station/historical/klima-v2-1d?parameters=tlmax&start=1950-01-01&end={today()}&station_ids=105"))
+
+eumap <- gisco_get_nuts(year = 2021, epsg = 4326, nuts_level = 0, resolution = 10)
+```
+
+# Auf einen Blick
+
+## Row
+
+```{r value_gdp}
+latestgdp <- gdp |> filter(unit == "CP_MEUR") |> slice_max(time, n = 1)
+growthrate <- gdpgrowth |> slice_max(time, n = 1) |> pull(values)
+
+value_box(
+  theme = value_box_theme(bg = "#2F5D7E"),
+  showcase = bsicons::bs_icon("wrench"),
+  title = glue::glue("BIP in Mrd. € ({year(latestgdp$time)})"),
+  value = scales::comma(latestgdp$values/1e3, accuracy = 0.1, decimal.mark = ","),
+  p(glue::glue("{scales::comma(growthrate, accuracy = 0.1, decimal.mark = ',', suffix = '%')} real {ifelse(growthrate > 0, 'mehr', 'weniger')} als {year(latestgdp$time)-1}"))
+)
+```
+
+::: {.card title="Was ist der Wohlstandsmonitor?<i class='bi bi-grid-3x3-gap-fill'></i>" class="info-card" width = "33%" .flow}
+Der AK Wohlstandsmonitor beobachtet den gesellschaftlichen Fortschritt und Wohlstand in Österreich anhand verschiedener Indikatoren. Über das Bruttoinlandsprodukt (BIP) hinaus, stellen wir Lebensqualität, soziale Gerechtigkeit und ökologische Nachhaltigkeit in den Mittelpunkt. 
+
+<i class='bi bi-box-arrow-up-left'></i> [Weiterführende Informationen](https://www.akwien.at/wohlstandsbericht)
+:::
+
+```{r value_unemp}
+latestunemp <- unemp |> filter(geo == "AT") |> slice_max(time, n = 1)
+lastunemp <- unemp |> filter(geo == "AT") |> slice_max(time, n = 2) |> slice_min(time, n = 1) |> pull(values)
+
+value_box(
+  theme = value_box_theme(bg = "#A65D4E"),
+  showcase = bsicons::bs_icon("person-gear"),
+  title = glue::glue("Arbeitslose im {month(latestunemp$time, label = TRUE, abbr = FALSE, locale = 'de_DE')}"),
+  value = scales::comma(latestunemp$values, accuracy = 0.1, decimal.mark = ",", suffix = "%"),
+  p(glue::glue("gegenüber {scales::comma(lastunemp, accuracy = 0.1, decimal.mark = ',', suffix = '%')} im Vormonat"))
+)
+```
+
+## Row
+
+```{r value_poverty}
+latestpoverty <- poverty |> filter(geo == "AT") |> slice_max(time, n = 1)
+lastpoverty <- poverty |> filter(geo == "AT") |> slice_max(time, n = 2) |> slice_min(time, n = 1) |> pull(values)
+
+value_box(
+  theme = value_box_theme(bg = "#756A8D"),
+  showcase = bsicons::bs_icon("cart-x"),
+  title = glue::glue("Armutsgefährdung ({year(latestpoverty$time)})"),
+  value = scales::comma(latestpoverty$values, accuracy = 0.1, decimal.mark = ",", suffix = "%"),
+  p(glue::glue("gegenüber {scales::comma(lastpoverty, accuracy = 0.1, decimal.mark = ',', suffix = '%')} im Jahr {year(latestpoverty$time)-1}"))
+)
+```
+
+
+```{r value_tmax}
+data <- fromJSON(rawToChar(tempwien$content))
+
+tmax <- map_dfc(data$features$properties$parameters$tlmax$data, ~ .x) |> 
+  mutate(time = as.Date(data$timestamps)) |> 
+  pivot_longer(-time, names_to = "id", values_to = "tmax", names_transform = list(id = as.numeric))
+
+tmax_filter <- tmax |> 
+  filter(month(time) < month(today()) |
+    (month(time) == month(today()) & day(time) <= day(today()))
+  )
+
+findat <- tmax_filter |>
+  filter(tmax >= 30) |>  count(year(time), .drop = FALSE) |> 
+  rename(year = `year(time)`)
+
+lasttmax <- findat |> slice_max(year, n = 1) |> pull(n)
+avgtmax <- findat |> filter(year >= 1960, year <= 1990) |> summarise(avg = mean(n, na.rm = TRUE)) |> pull(avg)
+
+value_box(
+  theme = value_box_theme(bg = "#577A68"),
+  showcase = bsicons::bs_icon("thermometer-sun"),
+  title = glue::glue("Hitzetage bis {format(max(tmax$time), '%d.%m.%Y')}"),
+  value = scales::comma(lasttmax),
+  p(glue::glue("{comma(lasttmax - avgtmax, accuracy = 1)} Tage {ifelse(lasttmax > avgtmax, 'mehr', 'weniger')} als Ø 1960-1990"))
+)
+
+```
+
+::: {.card title="Unsere aktuelle Einschätzung<i class='bi bi-lightbulb-fill'></i>" class="info-card" width = "33%" .flow}
+Die Lage am Arbeitsmarkt ist angespannt, die Inflation ist weiterhin hoch. Parallel dazu entwickelt sich der private Konsum schwach, Unternehmen halten sich bei großen Investitionen zurück. Die Exporte sind durch die unberechenbare Zollpolitik der USA und schwache Wirtschaftsentwicklung in wichtigen Märkten belastet.
+
+<i class='bi bi-box-arrow-up-left'></i> [Ausführliche Version](https://www.akwien.at/unsere-forderungen)
+:::
+
+## Row
+
+::: {.card title="Unsere wichtigsten Forderungen!<i class='bi bi-megaphone-fill'></i>" class="info-card" width = "33%" .flow scrolling="true"}
+- Kampf gegen die Teuerung mit Preisdatenbank, Anti-Teuerungskommission, Abschaffung des Österreich-Aufschlags, Mietendeckel ohne Befristungen 
+- Eine Kindergrundsicherung, damit kein Kind in Armut aufwachsen muss 
+- Eine gerechte Finanzierung: Progressive Steuern auf Millionenerbschaften und Millionenvermögen 
+- Umsetzung des AK Plans für einen sozialen und ökologischen Umbau 
+- Arbeitsbedingungen verbessern und Qualifikation ermöglichen
+:::
+
+```{r value_gpg}
+latestgpg <- gpg |> filter(geo == "AT") |> slice_max(time, n = 1)
+gpgrank <- gpg |> filter(geo %in% countries$iso2c) |> arrange(values) |> mutate(rank = row_number()) |> filter(geo == "AT") |> pull(rank)
+
+value_box(
+  theme = value_box_theme(bg = "#2F5D7E"),
+  showcase = bsicons::bs_icon("gender-ambiguous"),
+  title = glue::glue("Gender Pay Gap ({year(latestgpg$time)})"),
+  value = scales::comma(latestgpg$values, accuracy = 0.1, decimal.mark = ",", suffix = "%"),
+  p(glue::glue("{gpgrank}. Platz aller EU-Staaten"))
+)
+```
+
+```{r value_infl}
+latestinfl <- inflation |> filter(geo == "AT") |> slice_max(time, n = 1)
+lastinfl <- inflation |> filter(geo == "AT") |> slice_max(time, n = 2) |> slice_min(time, n = 1) |> pull(values)
+
+value_box(
+  theme = value_box_theme(bg = "#9A8158"),
+  showcase = bsicons::bs_icon("cash-stack"),
+  title = glue::glue("Inflation im {month(latestinfl$time, label = TRUE, abbr = FALSE, locale = 'de_DE')}"),
+  value = scales::comma(latestinfl$values, accuracy = 0.1, decimal.mark = ",", suffix = "%"),
+  p(glue::glue("gegenüber {scales::comma(lastinfl, accuracy = 0.1, decimal.mark = ',', suffix = '%')} im Vormonat"))
+)
+```
+
+# Wohlstand
+
+## Row {height="60%"}
+
+### Column {.tabset width="60%"}
+
+```{r plot_gdppc}
+#| title: "BIP pro Kopf in Österreich"
+plot1 <- gdppc |> filter(geo == "AT", !is.na(values)) |> 
+    ggplot(aes(x = time, y = values)) +
+    geom_point(aes(text = glue::glue("{year(time)}: {scales::number(values, accuracy = 1, big.mark = '.', suffix = ' €')}")), 
+    color = "darkred", size = 2) +
+    geom_line(color = "darkred", linewidth = 1.4) +
+    scale_y_continuous(labels = scales::comma_format(big.mark = ".", decimal.mark = ",", suffix = " €")) +
+    labs(title = NULL, x = NULL, y = NULL) +
+    theme_minimal(base_family = "Roboto Condensed", base_size = 14) +
+    theme(panel.grid.minor = element_blank())
+
+ggplotly(plot1, tooltip = "text") |>
+    layout(hoverlabel = list(bgcolor = "white", font = list(family = "Roboto Condensed")))
+```
+
+```{r}
+#| title: "Rohdaten"
+gdppc |> filter(geo == "AT", !is.na(values)) |> 
+    mutate(year = year(time)) |>
+    select(year, values) |>
+    DT::datatable(colnames = c("Jahr", "BIP pro Kopf"), class = "stripe hover", 
+              extensions = 'Buttons',
+    options = list(buttons = list('copy', 'csv'), dom = 'Bfrtip',
+                   language = list(url = 'https://cdn.datatables.net/plug-ins/1.11.3/i18n/de_de.json')))
+```
+
+### Column {width="40%"}
+
+```{r}
+#| title: "BIP pro Kopf im Europavergleich 2025"
+plot2 <- gdppc |> filter(geo %in% countries$iso2c) |> 
+    slice_max(time, n = 1, by = geo) |>
+    mutate(geo = fct_reorder(geo, values),
+        country = countrycode(geo, origin = "iso2c", destination = "country.name.de")) |>
+    ggplot(aes(x = values, y = geo, text = glue::glue("{country}: {scales::number(values, accuracy = 1, big.mark = '.', suffix = ' €')}"))) +
+    geom_segment(aes(x = 0, xend = values, y = geo, yend = geo), color = "darkred", size = 1.4) +
+    geom_point(color = "darkred", size = 2) +
+    labs(title = NULL, x = NULL, y = NULL, color = "Land") +
+    theme_minimal(base_family = "Roboto Condensed") +
+    theme(panel.grid.major.y = element_blank())
+
+ggplotly(plot2, tooltip = "text") |>
+    layout(hoverlabel = list(bgcolor = "white", font = list(family = "Roboto Condensed")))
+```
+
+## Row {height="40%"}
+
+```{r}
+#| title: "BIP pro Kopf in Österreich"
+plot1 <- gdppc |> filter(geo == "AT", !is.na(values)) |> 
+    ggplot(aes(x = time, y = values)) +
+    geom_point(aes(text = glue::glue("{year(time)}: {scales::number(values, accuracy = 1, big.mark = '.', suffix = ' €')}")), 
+    color = "darkred", size = 2) +
+    geom_line(color = "darkred", size = 1.4) +
+    scale_y_continuous(labels = scales::comma_format(big.mark = ".", decimal.mark = ",", suffix = " €")) +
+    labs(title = NULL, x = NULL, y = NULL) +
+    theme_minimal(base_family = "Roboto Condensed", base_size = 14) +
+    theme(panel.grid.minor = element_blank())
+
+ggplotly(plot1, tooltip = "text") |>
+    layout(hoverlabel = list(bgcolor = "white", font = list(family = "Roboto Condensed")))
+```
+
+
+# Arbeit
+
+## Row
+
+### Column {width="60%"}
+
+::: {.panel-tabset}
+
+#### Arbeitslosigkeit in Europa
+
+ ```{r}
+#| results: asis
+mapdata <- eumap |> 
+    left_join(unemp |> slice_max(time, n = 1, by = geo), by = c("NUTS_ID" = "geo")) |> 
+    drop_na()
+
+pal <- leaflet::colorNumeric("YlOrRd", domain = mapdata$values)
+
+leaflet(mapdata, 
+    height = "100vh",
+    options = leafletOptions(maxZoom = 3.7, minZoom = 3.7, boxZoom = FALSE, zoomControl = FALSE, dragging = FALSE, keyboard = FALSE, doubleClickZoom = FALSE, attributionControl = FALSE)) |> 
+    addProviderTiles(providers$CartoDB.VoyagerNoLabels) |>
+    addPolygons(fillColor = ~pal(values), weight = 1.5, color = "black", fillOpacity = 1,
+    label = ~lapply(glue::glue(
+      "<span style='color:darkred;font-size:120%;font-family:Roboto Condensed;'>{toupper(NAME_GERM)}</span><br>",
+      "{month(time, label = TRUE, abbr = TRUE, locale = 'de_DE')} '{format(time, '%y')}: {values}%"
+    ), htmltools::HTML),
+    labelOptions = labelOptions(direction = "top")) |> 
+    setView(lng = 11.57549, lat = 56.13743, 3.7)
+ ```
+
+#### Rohdaten
+
+```{r}
+#| results: asis
+unemp |> slice_max(time, n = 1, by = geo) |>
+    mutate(country = countrycode(geo, origin = "iso2c", destination = "country.name.de")) |>
+    filter(geo %in% countries$iso2c) |>
+    select(country, time, values) |>
+    drop_na() |>
+    arrange(desc(values)) |>
+    DT::datatable(colnames = c("Land", "Zeitraum", "Arbeitslosenquote"), class = "stripe hover", 
+              extensions = 'Buttons',
+    options = list(buttons = list('copy', 'csv'), dom = 'Bfrtip',
+                   language = list(url = 'https://cdn.datatables.net/plug-ins/1.11.3/i18n/de_de.json'))) |> 
+    formatStyle(columns = 1:3, fontSize = '80%')
+```
+
+:::
+
+### Column {width="40%"}
+
+#### Row {height="70%"}
+
+```{r}
+#| title: "Arbeitslosigkeit in Österreich"
+unempat <- annualunemp |> filter(geo == "AT", !is.na(values)) |> 
+    ggplot(aes(x = time, y = values)) +
+    geom_point(aes(text = glue::glue("{year(time)}: {scales::number(values, accuracy = 0.1, suffix = '%')}")), 
+    color = "darkred", size = 2) +
+    geom_line(color = "darkred", size = 1.4) +
+    scale_y_continuous(labels = scales::comma_format(decimal.mark = ",", suffix = "%")) +
+    labs(title = NULL, x = NULL, y = NULL) +
+    theme_minimal(base_family = "Roboto Condensed", base_size = 14) +
+    theme(panel.grid.minor = element_blank())
+
+ggplotly(unempat, tooltip = "text") |>
+    layout(hoverlabel = list(bgcolor = "white", font = list(family = "Roboto Condensed")))
+```
+
+#### Row {height="35%"}
+
+::: {.card title="Zitat <i class='bi bi-chat-right-quote-fill'></i>" class="quote-card"}
+
+<div class="quote-text">
+
+Die Lage am Arbeitsmarkt ist angespannt. Wir brauchen eine gesunde Vollzeit und ein Qualifizierungsgeld, das Weiterbildungen und Umschulungen ermöglicht.
+
+</div>
+
+<div class="quote-author">
+Sybille Pirklbauer<br>
+<span>Leiterin Sozialpolitik, AK Wien</span>
+</div>
+
+:::
+
+# Lebensqualität
+
+
+# Umwelt
+
+
+# Stabilität

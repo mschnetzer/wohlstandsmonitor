@@ -1,0 +1,136 @@
+@import url("https://fonts.googleapis.com/css2?family=Amatic+SC&family=Barlow+Condensed:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Oswald:wght@200..700&family=Fira+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto+Slab:wght@100..900&&family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&display=swap");
+
+/*-- scss:defaults --*/
+$font-family-sans-serif: "Fira Sans";
+$h2-font-size:          1.6rem !default;
+$headings-font-weight:  500 !default;
+$wohlstand: #2F5D7E;
+$arbeit: #A65D4E;
+$leben: #756A8D;
+$umwelt: #577A68;
+$stabilitat: #9A8158;
+$link-color: tomato;
+
+/*-- scss:rules --*/
+h1, h2, h3, h4, h5, h6 {
+  text-shadow: -1px -1px 0 rgba(0, 0, 0, .3);
+}
+
+/*-- Navigation width and color of menu items --*/
+
+.navbar-title {
+  text-transform: uppercase !important;
+}
+
+#dashboard-collapse .navbar-nav {
+  flex: 1 1 auto;
+}
+
+#dashboard-collapse .navbar-nav .nav-item {
+  flex: 1 1 0;
+}
+
+#dashboard-collapse .navbar-nav .nav-link {
+  display: flex;
+  justify-content: center;
+}
+
+a.nav-link[href="#wohlstand"] {
+  background-color: $wohlstand !important;
+}
+
+a.nav-link[href="#arbeit"] {
+  background-color: $arbeit !important;
+}
+
+a.nav-link[href="#lebensqualität"] {
+  background-color: $leben !important;
+}
+
+a.nav-link[href="#umwelt"] {
+  background-color: $umwelt !important;
+}
+
+a.nav-link[href="#stabilität"] {
+  background-color: $stabilitat !important;
+}
+
+.navbar .nav-link.active {
+  filter: brightness(1.35);
+}
+
+
+/*-- Value boxes --*/
+.bslib-value-box .value-box-value {
+    font-family: "Fira Sans";
+    font-size: clamp(1.3rem, 4vw, 2rem);
+    font-weight: 700;
+}
+
+.bslib-value-box .value-box-title {
+    font-family: "Roboto Slab";
+    font-size: clamp(1.0rem, 3vw, 1.3rem) !important;
+}
+
+.bslib-value-box p {
+    font-family: "Roboto Slab";
+    font-size: clamp(0.8rem, 3vw, 1.1rem);
+    font-weight: normal !important;
+}
+
+/*-- Cards title and contents for quotes --*/
+
+.card-header {
+  font-family: "Fira Sans", sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.info-card {
+  font-family: "Fira Sans", sans-serif;
+  font-size: 0.8rem;
+}
+
+.quote-card .card-body {
+  font-family: "Fira Sans", sans-serif;
+  padding-left: 1.5rem;
+}
+
+.quote-card .quote-text {
+  font-size: 1rem;
+  font-weight: 300;
+  line-height: 1.3rem;
+  font-style: italic;
+}
+
+.quote-card .quote-author {
+  margin-top: 1.3rem;
+  font-size: 0.7rem;
+  font-weight: 200;
+  color: #666;
+  text-align: right;
+}
+
+
+/*-- Buttons for raw data download in DT tables --*/
+.buttons-csv, .buttons-copy {
+  align-items: center;
+  background: #FFFFFF !important;
+  border: 0 solid #E2E8F0 !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+  box-sizing: border-box !important;
+  color: #1A202C;
+  display: inline-flex;
+  font-family: 'Roboto Condensed';
+  font-size: 0.75rem !important;
+  justify-content: center;
+  overflow-wrap: break-word;
+  text-decoration: none;
+  width: auto;
+  border-radius: 4px;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
