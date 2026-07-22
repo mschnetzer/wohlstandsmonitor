@@ -1,3 +1,6 @@
 /dashboard_cache/
 /dashboard_files/
 *.html
+
+/.quarto/
+**/*.quarto_ipynb

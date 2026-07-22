@@ -1,6 +1,8 @@
 ---
 title: "Wohlstandsmonitor"
-# author: "Matthias Schnetzer"
+project: 
+    website
+
 format: 
     dashboard:
         expandable: false
