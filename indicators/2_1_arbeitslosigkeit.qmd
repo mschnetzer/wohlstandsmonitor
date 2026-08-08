@@ -8,7 +8,7 @@ format:
     orientation: rows
 ---
 
-```{r setup, echo = FALSE}
+```{r setup}
 #| include: false
 #| echo: false
 #| message: false

@@ -1,9 +1,6 @@
 ---
-format:
-  dashboard:
-    expandable: false
-    scrolling: false
-    orientation: rows
+format: dashboard
+search: true
 ---
 
 ```{r setup}

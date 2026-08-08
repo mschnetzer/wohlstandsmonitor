@@ -5,11 +5,12 @@ project:
 
 website: 
   title: "Wohlstandsmonitor"
-  page-navigation: true
+  search:
+    location: navbar
+    type: overlay
   navbar: 
-    search: true
     left:
-      - text: '<span class="nav-wohlstand">Wohlstand</span>'
+      - text: '<span class="nav-wohlstand navitem">Wohlstand</span>'
         menu:
           - text: "Überblick"
             href: indicators/1_wohlstand.qmd
@@ -17,7 +18,7 @@ website:
             href: indicators/1_1_wertschöpfung.qmd
           - text: "Ungleichheit"
             href: indicators/1_2_ungleichheit.qmd
-      - text: '<span class="nav-arbeit">Arbeit</span>'
+      - text: '<span class="nav-arbeit navitem">Arbeit</span>'
         menu:
           - text: "Überblick"
             href: indicators/2_arbeit.qmd
@@ -25,18 +26,16 @@ website:
             href: indicators/2_1_arbeitslosigkeit.qmd
           - text: "Unbezahlte Arbeit"
             href: indicators/2_2_unbezahlte_arbeit.qmd
-      - text: '<span class="nav-leben">Leben</span>'
+      - text: '<span class="nav-leben navitem">Leben</span>'
         menu: 
-          - text: "Überblick"
-            href: indicators/3_leben.qmd
-      - text: '<span class="nav-umwelt">Umwelt</span>'
+          - text: "Überblick"            
+      - text: '<span class="nav-umwelt navitem">Umwelt</span>'
         menu:
           - text: "Überblick"
-            href: indicators/4_umwelt.qmd
-      - text: '<span class="nav-stabilitat">Stabilität</span>'
+      - text: '<span class="nav-stabilitat navitem">Stabilität</span>'
         menu:
           - text: "Überblick"
-            href: indicators/5_stabilitat.qmd
+           
     tools:
       - icon: envelope
         href: mailto:matthias.schnetzer(at)akwien.at
@@ -48,10 +47,8 @@ website:
         href: https://bsky.app/profile/matthiasschnetzer.bsky.social
         aria-label: Bluesky
 
-
-
 format:
-  dashboard:
+  html:
     theme:
       - sandstone
       - econdash.scss
