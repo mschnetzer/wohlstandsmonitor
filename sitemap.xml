@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://mschnetzer.github.io/wohlstandsmonitor/indicators/1_wohlstand.html</loc>
+    <lastmod>2026-08-08T10:34:29.475Z</lastmod>
+  </url>
+  <url>
+    <loc>https://mschnetzer.github.io/wohlstandsmonitor/indicators/2_1_arbeitslosigkeit.html</loc>
+    <lastmod>2026-08-08T10:56:07.810Z</lastmod>
+  </url>
+  <url>
+    <loc>https://mschnetzer.github.io/wohlstandsmonitor/indicators/1_1_wertschöpfung.html</loc>
+    <lastmod>2026-08-08T10:34:18.978Z</lastmod>
+  </url>
+  <url>
+    <loc>https://mschnetzer.github.io/wohlstandsmonitor/dashboard.html</loc>
+    <lastmod>2026-08-08T11:24:58.086Z</lastmod>
+  </url>
+  <url>
+    <loc>https://mschnetzer.github.io/wohlstandsmonitor/indicators/2_arbeit.html</loc>
+    <lastmod>2026-08-08T10:55:55.906Z</lastmod>
+  </url>
+  <url>
+    <loc>https://mschnetzer.github.io/wohlstandsmonitor/indicators/2_2_unbezahlte_arbeit.html</loc>
+    <lastmod>2026-08-08T10:55:49.594Z</lastmod>
+  </url>
+  <url>
+    <loc>https://mschnetzer.github.io/wohlstandsmonitor/indicators/1_2_ungleichheit.html</loc>
+    <lastmod>2026-08-08T10:34:24.208Z</lastmod>
+  </url>
+</urlset>
