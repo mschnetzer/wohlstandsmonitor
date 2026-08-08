@@ -2,5 +2,7 @@
 /dashboard_files/
 *.html
 
+/docs/
+/data/
 /.quarto/
 **/*.quarto_ipynb
