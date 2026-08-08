@@ -1,0 +1,88 @@
+---
+title: "Arbeit"
+body-classes: page-arbeit
+format:
+  dashboard:
+    expandable: false
+    scrolling: false
+    orientation: rows
+---
+
+```{r setup, echo = FALSE}
+#| include: false
+#| echo: false
+#| message: false
+#| warning: false
+source("../scripts/load_packages.R")
+
+load("../data/snapshot.RData")
+```
+
+## Row {height="60%"}
+
+### Column {.tabset width="60%"}
+
+```{r plot_gdppc}
+#| title: "BIP pro Kopf in Österreich"
+plot1 <- gdppc |> filter(geo == "AT", !is.na(values)) |> 
+    ggplot(aes(x = time, y = values)) +
+    geom_point(aes(text = glue::glue("{year(time)}: {scales::number(values, accuracy = 1, big.mark = '.', suffix = ' €')}")), 
+    color = "darkred", size = 2) +
+    geom_line(color = "darkred", linewidth = 1.4) +
+    scale_y_continuous(labels = scales::comma_format(big.mark = ".", decimal.mark = ",", suffix = " €")) +
+    labs(title = NULL, x = NULL, y = NULL) +
+    theme_minimal(base_family = "Roboto Condensed", base_size = 14) +
+    theme(panel.grid.minor = element_blank())
+
+ggplotly(plot1, tooltip = "text") |>
+    layout(hoverlabel = list(bgcolor = "white", font = list(family = "Roboto Condensed")))
+```
+
+```{r}
+#| title: "Rohdaten"
+gdppc |> filter(geo == "AT", !is.na(values)) |> 
+    mutate(year = year(time)) |>
+    select(year, values) |>
+    DT::datatable(colnames = c("Jahr", "BIP pro Kopf"), class = "stripe hover", 
+              extensions = 'Buttons',
+    options = list(buttons = list('copy', 'csv'), dom = 'Bfrtip',
+                   language = list(url = 'https://cdn.datatables.net/plug-ins/1.11.3/i18n/de_de.json')))
+```
+
+### Column {width="40%"}
+
+```{r}
+#| title: "BIP pro Kopf im Europavergleich 2025"
+plot2 <- gdppc |> filter(geo %in% countries$iso2c) |> 
+    slice_max(time, n = 1, by = geo) |>
+    mutate(geo = fct_reorder(geo, values),
+        country = countrycode(geo, origin = "iso2c", destination = "country.name.de")) |>
+    ggplot(aes(x = values, y = geo, text = glue::glue("{country}: {scales::number(values, accuracy = 1, big.mark = '.', suffix = ' €')}"))) +
+    geom_segment(aes(x = 0, xend = values, y = geo, yend = geo), color = "darkred", size = 1.4) +
+    geom_point(color = "darkred", size = 2) +
+    labs(title = NULL, x = NULL, y = NULL, color = "Land") +
+    theme_minimal(base_family = "Roboto Condensed") +
+    theme(panel.grid.major.y = element_blank())
+
+ggplotly(plot2, tooltip = "text") |>
+    layout(hoverlabel = list(bgcolor = "white", font = list(family = "Roboto Condensed")))
+```
+
+## Row {height="40%"}
+
+```{r}
+#| title: "BIP pro Kopf in Österreich"
+plot1 <- gdppc |> filter(geo == "AT", !is.na(values)) |> 
+    ggplot(aes(x = time, y = values)) +
+    geom_point(aes(text = glue::glue("{year(time)}: {scales::number(values, accuracy = 1, big.mark = '.', suffix = ' €')}")), 
+    color = "darkred", size = 2) +
+    geom_line(color = "darkred", size = 1.4) +
+    scale_y_continuous(labels = scales::comma_format(big.mark = ".", decimal.mark = ",", suffix = " €")) +
+    labs(title = NULL, x = NULL, y = NULL) +
+    theme_minimal(base_family = "Roboto Condensed", base_size = 14) +
+    theme(panel.grid.minor = element_blank())
+
+ggplotly(plot1, tooltip = "text") |>
+    layout(hoverlabel = list(bgcolor = "white", font = list(family = "Roboto Condensed")))
+```
+

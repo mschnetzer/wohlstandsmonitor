@@ -1,0 +1,104 @@
+---
+title: "Wohlstand ▸ Wertschöpfung"
+body-classes: page-wohlstand
+format:
+  dashboard:
+    expandable: false
+    scrolling: false
+    orientation: rows
+---
+
+```{r setup, echo = FALSE}
+#| include: false
+#| echo: false
+#| message: false
+#| warning: false
+source("../scripts/load_packages.R")
+
+load("../data/snapshot.RData")
+```
+
+## Row
+
+### Column {width="60%"}
+
+::: {.panel-tabset}
+
+#### Arbeitslosigkeit in Europa
+
+ ```{r}
+#| results: asis
+mapdata <- eumap |> 
+    left_join(unemp |> slice_max(time, n = 1, by = geo), by = c("NUTS_ID" = "geo")) |> 
+    drop_na()
+
+pal <- leaflet::colorNumeric("YlOrRd", domain = mapdata$values)
+
+leaflet(mapdata, 
+    height = "100vh",
+    options = leafletOptions(maxZoom = 3.7, minZoom = 3.7, boxZoom = FALSE, zoomControl = FALSE, dragging = FALSE, keyboard = FALSE, doubleClickZoom = FALSE, attributionControl = FALSE)) |> 
+    addProviderTiles(providers$CartoDB.VoyagerNoLabels) |>
+    addPolygons(fillColor = ~pal(values), weight = 1.5, color = "black", fillOpacity = 1,
+    label = ~lapply(glue::glue(
+      "<span style='color:darkred;font-size:120%;font-family:Roboto Condensed;'>{toupper(NAME_GERM)}</span><br>",
+      "{month(time, label = TRUE, abbr = TRUE, locale = 'de_DE')} '{format(time, '%y')}: {values}%"
+    ), htmltools::HTML),
+    labelOptions = labelOptions(direction = "top")) |> 
+    setView(lng = 11.57549, lat = 56.13743, 3.7)
+ ```
+
+#### Rohdaten
+
+```{r}
+#| results: asis
+unemp |> slice_max(time, n = 1, by = geo) |>
+    mutate(country = countrycode(geo, origin = "iso2c", destination = "country.name.de")) |>
+    filter(geo %in% countries$iso2c) |>
+    select(country, time, values) |>
+    drop_na() |>
+    arrange(desc(values)) |>
+    DT::datatable(colnames = c("Land", "Zeitraum", "Arbeitslosenquote"), class = "stripe hover", 
+              extensions = 'Buttons',
+    options = list(buttons = list('copy', 'csv'), dom = 'Bfrtip',
+                   language = list(url = 'https://cdn.datatables.net/plug-ins/1.11.3/i18n/de_de.json'))) |> 
+    formatStyle(columns = 1:3, fontSize = '80%')
+```
+
+:::
+
+### Column {width="40%"}
+
+#### Row {height="70%"}
+
+```{r}
+#| title: "Arbeitslosigkeit in Österreich"
+unempat <- annualunemp |> filter(geo == "AT", !is.na(values)) |> 
+    ggplot(aes(x = time, y = values)) +
+    geom_point(aes(text = glue::glue("{year(time)}: {scales::number(values, accuracy = 0.1, suffix = '%')}")), 
+    color = "darkred", size = 2) +
+    geom_line(color = "darkred", size = 1.4) +
+    scale_y_continuous(labels = scales::comma_format(decimal.mark = ",", suffix = "%")) +
+    labs(title = NULL, x = NULL, y = NULL) +
+    theme_minimal(base_family = "Roboto Condensed", base_size = 14) +
+    theme(panel.grid.minor = element_blank())
+
+ggplotly(unempat, tooltip = "text") |>
+    layout(hoverlabel = list(bgcolor = "white", font = list(family = "Roboto Condensed")))
+```
+
+#### Row {height="35%"}
+
+::: {.card title="Zitat <i class='bi bi-chat-right-quote-fill'></i>" class="quote-card"}
+
+<div class="quote-text">
+
+Die Lage am Arbeitsmarkt ist angespannt. Wir brauchen eine gesunde Vollzeit und ein Qualifizierungsgeld, das Weiterbildungen und Umschulungen ermöglicht.
+
+</div>
+
+<div class="quote-author">
+Sybille Pirklbauer<br>
+<span>Leiterin Sozialpolitik, AK Wien</span>
+</div>
+
+:::
