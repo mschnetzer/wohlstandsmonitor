@@ -1,31 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://mschnetzer.github.io/wohlstandsmonitor/indicators/1_wohlstand.html</loc>
-    <lastmod>2026-08-08T10:34:29.475Z</lastmod>
-  </url>
-  <url>
-    <loc>https://mschnetzer.github.io/wohlstandsmonitor/indicators/2_1_arbeitslosigkeit.html</loc>
-    <lastmod>2026-08-08T10:56:07.810Z</lastmod>
-  </url>
-  <url>
-    <loc>https://mschnetzer.github.io/wohlstandsmonitor/indicators/1_1_wertschöpfung.html</loc>
-    <lastmod>2026-08-08T10:34:18.978Z</lastmod>
-  </url>
-  <url>
-    <loc>https://mschnetzer.github.io/wohlstandsmonitor/dashboard.html</loc>
-    <lastmod>2026-08-08T11:24:58.086Z</lastmod>
-  </url>
-  <url>
-    <loc>https://mschnetzer.github.io/wohlstandsmonitor/indicators/2_arbeit.html</loc>
-    <lastmod>2026-08-08T10:55:55.906Z</lastmod>
-  </url>
-  <url>
-    <loc>https://mschnetzer.github.io/wohlstandsmonitor/indicators/2_2_unbezahlte_arbeit.html</loc>
-    <lastmod>2026-08-08T10:55:49.594Z</lastmod>
+    <loc>https://mschnetzer.github.io/wohlstandsmonitor/index.html</loc>
+    <lastmod>2026-08-08T12:57:36.831Z</lastmod>
   </url>
   <url>
     <loc>https://mschnetzer.github.io/wohlstandsmonitor/indicators/1_2_ungleichheit.html</loc>
-    <lastmod>2026-08-08T10:34:24.208Z</lastmod>
+    <lastmod>2026-08-08T12:55:15.644Z</lastmod>
+  </url>
+  <url>
+    <loc>https://mschnetzer.github.io/wohlstandsmonitor/indicators/2_2_unbezahlte_arbeit.html</loc>
+    <lastmod>2026-08-08T12:54:09.818Z</lastmod>
+  </url>
+  <url>
+    <loc>https://mschnetzer.github.io/wohlstandsmonitor/indicators/2_arbeit.html</loc>
+    <lastmod>2026-08-08T12:54:01.330Z</lastmod>
+  </url>
+  <url>
+    <loc>https://mschnetzer.github.io/wohlstandsmonitor/indicators/1_1_wertschöpfung.html</loc>
+    <lastmod>2026-08-08T12:54:34.754Z</lastmod>
+  </url>
+  <url>
+    <loc>https://mschnetzer.github.io/wohlstandsmonitor/indicators/2_1_arbeitslosigkeit.html</loc>
+    <lastmod>2026-08-08T12:54:17.125Z</lastmod>
+  </url>
+  <url>
+    <loc>https://mschnetzer.github.io/wohlstandsmonitor/indicators/1_wohlstand.html</loc>
+    <lastmod>2026-08-08T12:54:22.713Z</lastmod>
   </url>
 </urlset>
