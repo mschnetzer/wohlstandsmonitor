@@ -1,0 +1,57 @@
+project: 
+  type: website
+  output-dir: docs
+  pre-render: scripts/load_data.R
+
+website: 
+  title: "Wohlstandsmonitor"
+  page-navigation: true
+  navbar: 
+    search: true
+    left:
+      - text: '<span class="nav-wohlstand">Wohlstand</span>'
+        menu:
+          - text: "Überblick"
+            href: indicators/1_wohlstand.qmd
+          - text: "Wertschöpfung"
+            href: indicators/1_1_wertschöpfung.qmd
+          - text: "Ungleichheit"
+            href: indicators/1_2_ungleichheit.qmd
+      - text: '<span class="nav-arbeit">Arbeit</span>'
+        menu:
+          - text: "Überblick"
+            href: indicators/2_arbeit.qmd
+          - text: "Arbeitslosigkeit"
+            href: indicators/2_1_arbeitslosigkeit.qmd
+          - text: "Unbezahlte Arbeit"
+            href: indicators/2_2_unbezahlte_arbeit.qmd
+      - text: '<span class="nav-leben">Leben</span>'
+        menu: 
+          - text: "Überblick"
+            href: indicators/3_leben.qmd
+      - text: '<span class="nav-umwelt">Umwelt</span>'
+        menu:
+          - text: "Überblick"
+            href: indicators/4_umwelt.qmd
+      - text: '<span class="nav-stabilitat">Stabilität</span>'
+        menu:
+          - text: "Überblick"
+            href: indicators/5_stabilitat.qmd
+    tools:
+      - icon: envelope
+        href: mailto:matthias.schnetzer(at)akwien.at
+        aria-label: E-Mail
+      - icon: github
+        href: https://github.com/mschnetzer
+        aria-label: GitHub
+      - icon: bluesky
+        href: https://bsky.app/profile/matthiasschnetzer.bsky.social
+        aria-label: Bluesky
+
+
+
+format:
+  dashboard:
+    theme:
+      - sandstone
+      - econdash.scss
