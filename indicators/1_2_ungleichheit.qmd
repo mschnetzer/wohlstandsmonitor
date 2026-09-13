@@ -37,7 +37,8 @@ pal <- leaflet::colorNumeric("YlOrRd", domain = mapdata$values)
 leaflet(mapdata, 
     height = "100vh",
     options = leafletOptions(maxZoom = 3.7, minZoom = 3.7, boxZoom = FALSE, zoomControl = FALSE, dragging = FALSE, keyboard = FALSE, doubleClickZoom = FALSE, attributionControl = FALSE)) |> 
-    addProviderTiles(providers$CartoDB.VoyagerNoLabels) |>
+#    addProviderTiles(providers$CARTO.VoyagerNoLabels) |>
+    addTiles(urlTemplate = paste0("https://basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}.png?key=", Sys.getenv("CARTO_API"))) |> 
     addPolygons(fillColor = ~pal(values), weight = 1.5, color = "black", fillOpacity = 1,
     label = ~lapply(glue::glue(
       "<span style='color:darkred;font-size:120%;font-family:Roboto Condensed;'>{toupper(NAME_GERM)}</span><br>",

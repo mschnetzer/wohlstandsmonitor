@@ -28,7 +28,7 @@ website:
             href: indicators/2_2_unbezahlte_arbeit.qmd
       - text: '<span class="nav-leben navitem">Leben</span>'
         menu: 
-          - text: "Überblick"            
+          - text: "Überblick"          
       - text: '<span class="nav-umwelt navitem">Umwelt</span>'
         menu:
           - text: "Überblick"
